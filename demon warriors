@@ -1,0 +1,67 @@
+-- Auto Join Script to join waves automatically
+spawn(function()
+    while true do
+        pcall(function()
+            local waveButton = game:GetService("Workspace"):FindFirstChild("WaveJoinButton") -- تأكد من أن هذا الزر موجود في اللعبة
+            if waveButton then
+                waveButton:Click()  -- يدخل في الموجة
+            end
+        end)
+        wait(10)  -- كل 10 ثواني يدخل الموجة لو لقى الزرار
+    end
+end)
+
+-- Fast Attack & Auto Train Script
+spawn(function()
+    while true do
+        pcall(function()
+            -- نحدد الدمية المناسبة بناءً على المستوى
+            local playerLevel = game:GetService("Players").LocalPlayer.Character:FindFirstChild("Level")
+            local bestDummy = nil
+            for _, v in pairs(game:GetService("Workspace").Dummies:GetChildren()) do
+                if v:FindFirstChild("Health") and v.Health > 0 then
+                    local dummyLevel = tonumber(v.Name:match("Level (%d+)"))
+                    if dummyLevel and dummyLevel <= playerLevel.Value then
+                        bestDummy = v
+                        break
+                    end
+                end
+            end
+            
+            -- ضرب دمية التدريب بسرعة
+            if bestDummy then
+                game:GetService("ReplicatedStorage").Remotes.Damage:FireServer(bestDummy)
+            end
+        end)
+        wait(0.1) -- Fast Attack
+    end
+end)
+
+-- Anti-AFK Auto Clicker
+spawn(function()
+    while true do
+        pcall(function()
+            local VirtualUser = game:service'VirtualUser'
+            game:service'Players'.LocalPlayer.Idled:connect(function()
+                VirtualUser:Button2Down(Vector2.new(0,0),workspace)
+            end)
+        end)
+        wait(120) -- كل 2 دقيقة
+    end
+end)
+
+-- Expand Hitbox for Enemies (Auto Targeting Large Hitbox)
+spawn(function()
+    while true do
+        pcall(function()
+            for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                    -- هنا بنكبر الـ Hitbox بتاع الأعداء
+                    enemy.Size = Vector3.new(10, 10, 10)  -- كبرنا الحجم
+                    -- مفيش حاجة هنا تقلق على الدمج، لأنه كده هيتضر بشكل أكبر
+                end
+            end
+        end)
+        wait(0.5) -- كل 0.5 ثانية لتعديل الـ Hitbox
+    end
+end)
